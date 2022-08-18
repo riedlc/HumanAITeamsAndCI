@@ -37,6 +37,10 @@ for _, response in responses.iterrows():
 
 
 class SubAgentMemory:
+    '''
+    This is a mental model
+    It collects information and can aggregate the learned information
+    '''
 
     def __init__(self):
         self.exists = False
@@ -48,8 +52,12 @@ class SubAgentMemory:
         self.exists = True
         self.info.append(line)
 
-    # aggregate learned information
     def discern(self, surprise_weighting=False):
+        '''
+        Compute posteriors given the information observed
+        :param surprise_weighting:
+        :return:
+        '''
 
         if self.info == []:
             return [0.2] * 5
@@ -75,6 +83,11 @@ class SubAgentMemory:
         return self.dists
 
     def tmp_discern(self, surprise_weighting=False):
+        '''
+        Computer hypothetical posteriors but do not change any variables
+        :param surprise_weighting:
+        :return:
+        '''
         if self.info == []:
             return [0.2] * 5
 
@@ -116,6 +129,11 @@ class SubAgentMemory:
 
 
 class Agent:
+    '''
+    This is a model of the player
+    Agents have self.teammates, which is the agent's mental models for each teammate
+    self.teammates[self.agent_id] is an agent's mental model of itself
+    '''
 
     def __init__(self, agent_id, team_id, pub_clue, pri_clue, conversion, teammates, surprise_weighting,
                  tom, norm):
@@ -138,8 +156,11 @@ class Agent:
     def update(self, entity, line):
         self.teammates[entity].update(line[3:8])
 
-    # There are many different methods I could use here
     def discern(self):
+        '''
+        Infer a posterior based on the posteriors of an agent's mental models (teammates/SubAgents)
+        :return:
+        '''
         positions = []
 
         for t in self.teammates:
@@ -163,7 +184,11 @@ class Agent:
         return self.norm(result)
 
     def tmp_discern(self, random_info=False):
-        # TODO THIS DOESN"T WORK WITH TOM RIGHT NOW
+        '''
+        Test hypothetical posteriors given specific interventions
+        :param random_info: If true - conduct a random intervention
+        :return: a message to send that lowers the DKL between the ago and alter parameters
+        '''
         info = deepcopy(self.teammates[self.agent_id].info)
         if random_info:
             info.append(None)
@@ -197,6 +222,18 @@ class Agent:
 
 def tom_simulate(conversion, sub_agent, tom, ego_loop, return_prior, norm,
                  surprise_weighting):
+    '''
+    Simulate the model for every team and player
+    :param conversion: Information weights. Of the form
+            {-0.5: sn, -0.25: mn, 0: 1, 0.25: my, 0.5: sy}
+    :param sub_agent: Type of mental model. This is always SubAgentMemory
+    :param tom: Theory of Mind parameter Alpha_D
+    :param ego_loop: If true - include the self-actualization loop in the ego models
+    :param return_prior: If true - return a second set of distributions that is the prior for each agent
+    :param norm: Method to normalize values
+    :param surprise_weighting: If true - weight incoming information by it's surprise
+    :return: Posterior distributions for each player
+    '''
 
 
     # Simulate
@@ -233,44 +270,60 @@ def tom_simulate(conversion, sub_agent, tom, ego_loop, return_prior, norm,
 
 def tom_simulate_message_intervention(conversion, sub_agent, tom, ego_loop, return_prior=False, norm=normalize,
                                       surprise_weighting=False, random_info=False):
-	tom_dict = {}
-	prior_dict = {}
-	for team_id, val in chat_val_ordered.items():
-		clues = clues_dict[team_id]
+    '''
+    The same as the tom_simulate method above, but also perform the final intervention stpe
+    :param conversion:
+    :param sub_agent:
+    :param tom:
+    :param ego_loop:
+    :param return_prior:
+    :param norm:
+    :param surprise_weighting:
+    :param random_info: if true - perform a random intervention
+    :return:
+    '''
+    tom_dict = {}
+    prior_dict = {}
+    for team_id, val in chat_val_ordered.items():
+        clues = clues_dict[team_id]
 
-		pub_clue = culprit_clue_vals[clues['public'][0] - 1]
+        pub_clue = culprit_clue_vals[clues['public'][0] - 1]
 
-		team = [None] * 5
-		for x in range(5):
-			team[x] = Agent(x, team_id, pub_clue, culprit_clue_vals[clues[str( x +1)][0] - 1], conversion,
-			                [sub_agent() for _ in range(5)], tom=tom, norm=norm,
-			                surprise_weighting=surprise_weighting)
+        team = [None] * 5
+        for x in range(5):
+            team[x] = Agent(x, team_id, pub_clue, culprit_clue_vals[clues[str( x +1)][0] - 1], conversion,
+                            [sub_agent() for _ in range(5)], tom=tom, norm=norm,
+                            surprise_weighting=surprise_weighting)
 
-		# Chat data
-		for line in val:
-			speaker = line[0] - 1
-			listeners = deepcopy(line[1])
-			if ego_loop:
-				listeners.append(line[0])
-			for listener in listeners:
-				listener -= 1
-				team[listener].update(speaker, line)
+        # Chat data
+        for line in val:
+            speaker = line[0] - 1
+            listeners = deepcopy(line[1])
+            if ego_loop:
+                listeners.append(line[0])
+            for listener in listeners:
+                listener -= 1
+                team[listener].update(speaker, line)
 
-		for x in range(len(team)):
-			new_lines = team[x].tmp_discern(random_info=random_info)
-			for listener in range(len(new_lines)):
-				if new_lines[listener] is not None:
-					team[listener].teammates[x].update(new_lines[listener])
+        for x in range(len(team)):
+            new_lines = team[x].tmp_discern(random_info=random_info)
+            for listener in range(len(new_lines)):
+                if new_lines[listener] is not None:
+                    team[listener].teammates[x].update(new_lines[listener])
 
-		tom_dict[team_id] = [agent.discern() for agent in team]
-		prior_dict[team_id] = [agent.prior for agent in team]
+        tom_dict[team_id] = [agent.discern() for agent in team]
+        prior_dict[team_id] = [agent.prior for agent in team]
 
-	if return_prior:
-		return tom_dict, prior_dict
-	return tom_dict
+    if return_prior:
+        return tom_dict, prior_dict
+    return tom_dict
 
 
 def random_agent():
+    '''
+    Equivalent to an agent that randomly responds to this task
+    :return:
+    '''
     count = 0
     match = 0
     total = 0

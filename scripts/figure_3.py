@@ -1,6 +1,11 @@
 from scripts.simulation import *
 
 def fig_3a(tom_a):
+	'''
+	Generate figure 3a
+	:param tom_a: Model posteriors
+	:return:
+	'''
 	# generate these stats so the random seed
 	# matches plots from the paper
 	_ = performance(tom_a), human_agent_match(tom_a), performance(tom_a), human_agent_match(tom_a)
@@ -76,6 +81,11 @@ def fig_3a(tom_a):
 
 
 def compare_degree(d):
+	'''
+	Get model results and stats for each player
+	:param d: Model posteriors for each player
+	:return: dict with lists for each metric
+	'''
 	degrees = []
 	total_correct = []
 	culprit_correct = []
@@ -101,6 +111,11 @@ def compare_degree(d):
 
 
 def degree_bins(output):
+	'''
+	Aggregate model results by degree
+	:param output: Model posteriors
+	:return: 4 list of lists with model results aggregated by degree
+	'''
 	r_dict = compare_degree(output)
 	total_correct_bin = [[] for _ in range(4)]
 	culprit_correct_bin = [[] for _ in range(4)]
@@ -121,6 +136,11 @@ def degree_bins(output):
 
 
 def fig_3b(tom_a):
+	'''
+	Generate figure 3b
+	:param tom_a: model posteriors
+	:return:
+	'''
 	total_correct_bin, culprit_correct_bin, human_match_bin, agent_correct_bin = degree_bins(tom_a)
 
 	plt.plot([1, 2, 3, 4], [np.mean(x) * 100 - 0.5 for x in human_match_bin], marker='^', c=colors[0],
@@ -148,6 +168,11 @@ def fig_3b(tom_a):
 
 
 def fig_3c(tom_a):
+	'''
+	Generate figure 3c
+	:param tom_a: Model posteriors
+	:return:
+	'''
 
 	culprit_by_alpha = []
 	match_by_alpha = []
@@ -189,6 +214,8 @@ def fig_3c(tom_a):
 if __name__ == '__main__':
 	np.random.seed(101)
 	plt.rcParams.update({'font.size': 13})
+	# We use parameters from the Max Performance model
+	# SN = 0.35, MN = 0.85, MY = 1.95, SY = 2, Alpha_D = 0.95
 	conversion = {-0.5: 0.35, -0.25: .85, 0: 1, 0.25: 1.95, 0.5: 2}
 
 	tom_a, tom_no_a = tom_simulate(conversion, SubAgentMemory, tom=0.95, return_prior=True, norm=normalize,

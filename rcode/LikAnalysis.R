@@ -14,7 +14,7 @@
 #################################################
 
 # Change workikng directory
-setwd("~/Dropbox/Human-Agent-Teams-Hidden-Profile")
+setwd("YOUR WORKING DIRECTORY")
 
 # Load libraries
 require(data.table)

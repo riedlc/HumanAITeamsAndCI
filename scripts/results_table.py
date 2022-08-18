@@ -2,7 +2,6 @@ from scripts.simulation import *
 
 
 def generate_results():
-    # responses = pd.read_csv('../data/responses.csv')
 
     # prior results
     prior_performance = []
