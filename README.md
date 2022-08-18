@@ -1,7 +1,8 @@
 # Collective Intelligence In Human-AI Teams: A Bayesian Theory of Mind Approach
 
 Workflow:
-1. Change working directory to `HumanAITeamsAndCI`
+1. Download this directory
+1. Change working directory to the downloaded `HumanAITeamsAndCI` directory
 1. Create a Python 3.x environment and run `pip install -r requirements.txt`
 1. Run `python -m scripts/results_table` to replicate Table 1  
 1. Run `python -m scripts/figure_3` to replicate Figure 3  
