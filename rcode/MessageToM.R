@@ -46,32 +46,6 @@ teamLevelPerf <- read.csv("../data/TeamLevelAgg.csv", stringsAsFactors = FALSE)
 
 teamLevel <- merge(teamLevel, teamLevelPerf)
 
-##########################################
-## Table: Team-level regression
-##########################################
-models <- list(
-  lm(TeamPerf ~ NumMsg, teamLevel),
-  lm(TeamPerf ~ NumY, teamLevel),
-  lm(TeamPerf ~ MeanEgoSurprise, teamLevel),
-  lm(TeamPerf ~ MeanEgoSurpriseTypeY, teamLevel),
-  lm(TeamPerf ~ MeanAlterSurprise, teamLevel),
-  lm(TeamPerfMajVote ~ MeanAlterSurprise, teamLevel),
-  lm(TeamPerf ~ NumMsg + MeanAlterSurprise, teamLevel),
-  lm(TeamPerf ~ NumMsg + BetweennessMean, teamLevel),
-  lm(TeamPerf ~ NumMsg + ToMBetweennessMean, teamLevel)
-)
-screenreg(models, stars=c(.001, .01, .05, .1))
-
-
-
-models <- list(
-  lm(TeamPerf ~ NumMsg, teamLevel),
-  lm(TeamPerf ~ MeanEgoSurprise, teamLevel),
-  lm(TeamPerf ~ MeanAlterSurprise, teamLevel),
-  lm(TeamPerf ~ NumMsg + MeanAlterSurprise, teamLevel)
-)
-screenreg(models, stars=c(.001, .01, .05, .1))
-
 
 ####################################
 ## Figure: Team-level ToM predicts performance
@@ -120,20 +94,6 @@ ggplot(timeAgg, aes(x=TimeWindowP, y=SurpriseAccordingToSendersAlterModelOfRecei
   theme(legend.justification = c(1, 0), legend.position = c(1, 0.01)) +
   guides(color=guide_legend(nrow=1, byrow=TRUE))
 # ggsave("FIGURES/Rplot-Surprise-Pattern.pdf", width=5, height=3.333333)
-  
-ggplot(timeAgg, aes(x=TimeWindow, y=SurpriseAccordingToSendersAlterModelOfReceiver, color=TeamPerf, group=factor(TeamID))) +
-  geom_line()
-
-ggplot(timeAgg[timeAgg$Group=="low",], aes(x=TimeWindow, y=SurpriseAccordingToSendersAlterModelOfReceiver, color=TeamPerf, group=Group)) +
-  geom_point() +
-  geom_smooth()
-
-cor.test( timeAgg$TeamPerf[timeAgg$TimeWindow < 4], 
-          timeAgg$SurpriseAccordingToSendersAlterModelOfReceiver[timeAgg$TimeWindow < 4])
-
-# Not significant but high surprise at the end is actually negatively corr with perf
-cor.test( timeAgg$TeamPerf[timeAgg$TimeWindow > 12], 
-          timeAgg$SurpriseAccordingToSendersAlterModelOfReceiver[timeAgg$TimeWindow > 12])
 
 
 #####################################################
