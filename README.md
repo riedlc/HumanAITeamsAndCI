@@ -17,8 +17,8 @@ Workflow:
     - Line 3 and 76 require you to input preferred directories
     - This file aggregates the grid search data
     - Repeat to analyze both grid searches from above
-1. Run `scripts/LikAnalysis.R` to generate the logLiks from Table 1
+1. Run `rcode/LikAnalysis.R` to generate the logLiks from Table 1
     - Input your preferred directories where noted
-1. Run `scripts/MessageToM.R` to generate the plots in Figure 4
+1. Run `rcode/MessageToM.R` to generate the plots in Figure 4
     - Input your preferred directories where noted
   
