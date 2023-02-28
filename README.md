@@ -1,8 +1,7 @@
 # Collective Intelligence In Human-AI Teams: A Bayesian Theory of Mind Approach
 
 This is code for the following publication:
-Westby, S. & Riedl, C. (2023). Collective Intelligence in Human-AI Teams: A Bayesian Theory of Mind Approach. In Proceedings of the 37th AAAI Conference on Artificial Intelligence (2023).
-
+Westby, S. & Riedl, C. (2023). Collective Intelligence in Human-AI Teams: A Bayesian Theory of Mind Approach. In Proceedings of the 37th AAAI Conference on Artificial Intelligence (2023). https://arxiv.org/abs/2208.11660
 
 Workflow:
 1. Download this directory
